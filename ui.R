@@ -24,9 +24,7 @@ fluidPage(
                                             Apple="AAPL",
                                             Google="GOOG",
                                             Microsoft="MSFT",
-                                            Activision="ATVI",
-                                            UK30="^FTSE",
-                                            BTCUSD="BTCUSD"),
+                                            Activision="ATVI"),
                                
                                selected = NULL,
                                multiple = FALSE,

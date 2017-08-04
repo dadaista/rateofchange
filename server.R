@@ -28,14 +28,17 @@ shinyServer(function(input, output,session) {
 
   
   loadData<-reactive({
-    print ("loadin...")
+    print ("loading...")
     stock=getStockName()
-    data<-load(stock)
-
+    
+    data<-load_(stock,to.date = 365)#one year of data
     
     a <- as.Date(data$Date)
-    b <- data$Adj.Close
-    return (list(x=a,y=b))
+    b <- data[,stock]
+    
+    rtv=list(x=a,y=b)
+
+    return (rtv)
   })
 
   computeRoc<-reactive({
@@ -45,6 +48,8 @@ shinyServer(function(input, output,session) {
     k=input$range
     N=length(x)
     lag=input$hold
+    print(N)
+    print(k)
     rc<-roc(y[(N-k):N],lag=lag)
     return (rc)
   })  
@@ -53,15 +58,18 @@ shinyServer(function(input, output,session) {
   output$figure <- renderPlot(
                             { x=loadData()$x
                               y=loadData()$y
-                              index = (length(x)-input$range):length(x)
                               
+                              
+                              print(index)
                               par(mfrow=c(3,1),mar=c(2.5,2.5,1.5,1.5),oma=c(1,1,1,1)) 
-                              plot(x[index],y[index],type='l',
+                              plot(x,y,type='l',
                                    xlab="time",main="price")
                               
                               
                               rc<-computeRoc()
+                              
                               N=length(x)
+                              
                               k=input$range
                               plot(x[(N-k):(N-k+length(rc)-1)],
                                    rc,
@@ -86,6 +94,7 @@ shinyServer(function(input, output,session) {
     output$text<-renderText({
                               rc=computeRoc()
                               
+                              print(rc)
                               P=ecdf(rc)
                               paste("mean:",round(mean(rc),2),
                                     "\nstd:",round(sd(rc),2),
